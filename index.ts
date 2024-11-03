@@ -1,10 +1,10 @@
-import { ChatOllama } from "npm:@langchain/community/chat_models/ollama";
+import { ChatOllama } from "npm:@langchain/ollama";
 import { StringOutputParser } from "npm:@langchain/core/output_parsers";
 import { ChatPromptTemplate } from "npm:@langchain/core/prompts";
 import { RecursiveCharacterTextSplitter } from "npm:langchain/text_splitter";
-import { OllamaEmbeddings } from "npm:@langchain/community/embeddings/ollama";
+import { OllamaEmbeddings } from "npm:@langchain/ollama";
 import { MemoryVectorStore } from "npm:langchain/vectorstores/memory";
-import { PDFLoader } from "npm:langchain/document_loaders/fs/pdf";
+import { PDFLoader } from "npm:@langchain/community/document_loaders/fs/pdf";
 import { createStuffDocumentsChain } from "npm:langchain/chains/combine_documents";
 import { createRetrievalChain } from "npm:langchain/chains/retrieval";
 import { createHistoryAwareRetriever } from "npm:langchain/chains/history_aware_retriever";
@@ -15,16 +15,16 @@ const outputParser = new StringOutputParser();
 
 const chatModel = new ChatOllama({
   baseUrl: "http://localhost:11434", // Default value
-  model: "tinyllama",
+  model: "llama3.1",
 });
 
-const loader = new PDFLoader("MM-Resume-2023.pdf");
+const loader = new PDFLoader("MikeMulchrone_Resume2024.pdf");
 const docs = await loader.load();
 const splitter = new RecursiveCharacterTextSplitter();
 const splitDocs = await splitter.splitDocuments(docs);
 
 const embeddings = new OllamaEmbeddings({
-  model: "tinyllama",
+  model: "llama3.1",
   maxConcurrency: 5,
 });
 
@@ -94,6 +94,7 @@ const result2 = await conversationalRetrievalChain.invoke({
   input: "Tell me where I was working in 2020.",
 });
 
+console.log(result2.answer);
 chatHistory.push(new AIMessage(result2.answer));
 
 const results3 = await conversationalRetrievalChain.invoke({
